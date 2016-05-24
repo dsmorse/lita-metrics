@@ -96,7 +96,7 @@ module Lita
       end
 
       def same?(a, b)
-        a.to_s.downcase == b.to_s.downcase
+        a.to_s.casecmp(b.to_s) == 0
       end
     end
 
