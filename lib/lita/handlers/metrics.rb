@@ -13,7 +13,7 @@ module Lita
       config :invalid_command_logger, default: STDOUT
       config :valid_command_metric, type: String, default: 'lita.commands.valid'
       config :invalid_command_metric, type: String, default: 'lita.commands.invalid'
-      config :log_fields, default: [:user, :room, :message]
+      config :log_fields, default: %i[user room message]
       config :ignored_methods, type: Array, default: []
 
       on :loaded, :setup
@@ -33,7 +33,7 @@ module Lita
 
         self.class.statsd.increment(
           config.valid_command_metric,
-          tags: fields.each.select { |k, _v| k != :message }.map { |k, v| "#{k}:#{v}" }
+          tags: fields.each.reject { |k, _v| k == :message }.map { |k, v| "#{k}:#{v}" }
         )
 
         self.class.valid_command_log.info(format_log(fields)) unless fields[:private_message]
@@ -46,7 +46,7 @@ module Lita
 
         self.class.statsd.increment(
           config.invalid_command_metric,
-          tags: fields.each.select { |k, _v| k != :message }.map { |k, v| "#{k}:#{v}" }
+          tags: fields.each.reject { |k, _v| k == :message }.map { |k, v| "#{k}:#{v}" }
         )
 
         self.class.invalid_command_log.info(format_log(fields)) unless fields[:private_message]
@@ -95,9 +95,11 @@ module Lita
         false
       end
 
+      # rubocop:disable Naming/UncommunicativeMethodParamName
       def same?(a, b)
-        a.to_s.casecmp(b.to_s) == 0
+        a.to_s.casecmp(b.to_s).zero?
       end
+      # rubocop:enable Naming/UncommunicativeMethodParamName
     end
 
     Lita.register_handler(Metrics)

@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 describe Lita::Handlers::Metrics, lita_handler: true do
   let(:test_handler) do
     Class.new do
@@ -13,14 +14,11 @@ describe Lita::Handlers::Metrics, lita_handler: true do
       route(/command/, :test_command, command: true)
       route(/ignore/, :test_ignore)
 
-      def test_message(_response)
-      end
+      def test_message(_response); end
 
-      def test_command(_response)
-      end
+      def test_command(_response); end
 
-      def test_ignore(_response)
-      end
+      def test_ignore(_response); end
 
       route(/block/) do |_response|
       end
@@ -81,7 +79,7 @@ describe Lita::Handlers::Metrics, lita_handler: true do
       end
 
       it 'ignores methods specified in the configuration' do
-        registry.config.handlers.metrics.ignored_methods = %w(Test#test_ignore)
+        registry.config.handlers.metrics.ignored_methods = %w[Test#test_ignore]
         expect(described_class.statsd).not_to receive(:increment)
         send_message('ignore')
       end
@@ -166,4 +164,5 @@ describe Lita::Handlers::Metrics, lita_handler: true do
       end
     end
   end
+  # rubocop:enable Metrics/BlockLength
 end
